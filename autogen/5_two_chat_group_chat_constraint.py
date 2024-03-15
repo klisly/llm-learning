@@ -6,14 +6,22 @@ from autogen import ConversableAgent
 from autogen import GroupChat
 from autogen import GroupChatManager
 
-config_list = [ 
-        { 
-            "model": "Qwen-7B-Chat-Int4", 
-            "base_url": "http://localhost:8000/v1", 
-            "api_type": "open_ai", 
-            "api_key": "NULL", # just a placeholder 
-        } 
-    ]
+# config_list = [ 
+#         { 
+#             "model": "Qwen-7B-Chat-Int4", 
+#             "base_url": "http://localhost:8000/v1", 
+#             "api_type": "open_ai", 
+#             "api_key": "NULL", # just a placeholder 
+#         } 
+#     ]
+
+
+
+import os
+os.environ['OPENAI_API_KEY'] = 'sk-cbb956b0324648ca850d519fb4a8906585571044a24ceae7'
+os.environ["OPENAI_BASE_URL"] = "https://www.xiaoerchaoren.com:8907/g/v1"
+config_list = [{"model": "gpt-4", "api_key": os.environ.get("OPENAI_API_KEY")}]
+
 
 # The Number Agent always returns the same numbers.
 number_agent = ConversableAgent(

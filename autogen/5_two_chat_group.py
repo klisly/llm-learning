@@ -1,13 +1,21 @@
 import os
 from autogen import ConversableAgent
-config_list = [ 
-        { 
-            "model": "Qwen-7B-Chat-Int4", 
-            "base_url": "http://localhost:8000/v1", 
-            "api_type": "open_ai", 
-            "api_key": "NULL", # just a placeholder 
-        } 
-    ]
+# config_list = [ 
+#         { 
+#             "model": "Qwen-7B-Chat-Int4", 
+#             "base_url": "http://localhost:8000/v1", 
+#             "api_type": "open_ai", 
+#             "api_key": "NULL", # just a placeholder 
+#         } 
+#     ]
+
+
+import os
+os.environ['OPENAI_API_KEY'] = 'sk-cbb956b0324648ca850d519fb4a8906585571044a24ceae7'
+os.environ["OPENAI_BASE_URL"] = "https://www.xiaoerchaoren.com:8907/g/v1"
+config_list = [{"model": "gpt-4", "api_key": os.environ.get("OPENAI_API_KEY")}]
+
+
 
 # The Number Agent always returns the same numbers.
 number_agent = ConversableAgent(
@@ -48,6 +56,14 @@ divider_agent = ConversableAgent(
     llm_config={"config_list": config_list},
     human_input_mode="NEVER",
 )
+
+adder_agent.description = "Add 1 to each input number."
+multiplier_agent.description = "Multiply each input number by 2."
+subtracter_agent.description = "Subtract 1 from each input number."
+divider_agent.description = "Divide each input number by 2."
+number_agent.description = "Return the numbers given."
+
+
 from autogen import GroupChat
 
 group_chat = GroupChat(
@@ -56,6 +72,8 @@ group_chat = GroupChat(
     max_round=6,
     send_introductions=True # 自动发送自我介绍
 )
+
+
 
 from autogen import GroupChatManager
 

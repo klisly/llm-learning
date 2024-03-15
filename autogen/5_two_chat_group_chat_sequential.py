@@ -1,21 +1,16 @@
+'''
+顺序聊天
+'''
 import os
 from autogen import ConversableAgent
-
-import os
-os.environ['OPENAI_API_KEY'] = 'sk-cbb956b0324648ca850d519fb4a8906585571044a24ceae7'
-os.environ["OPENAI_BASE_URL"] = "https://www.xiaoerchaoren.com:8907/g/v1"
-
-
-# config_list = [ 
-#         { 
-#             "model": "Qwen-7B-Chat-Int4", 
-#             "base_url": "http://localhost:8000/v1", 
-#             "api_type": "open_ai", 
-#             "api_key": "NULL", # just a placeholder 
-#         } 
-#     ]
-
-config_list = [{"model": "gpt-4", "api_key": os.environ.get("OPENAI_API_KEY")}]
+config_list = [ 
+        { 
+            "model": "Qwen-7B-Chat-Int4", 
+            "base_url": "http://localhost:8000/v1", 
+            "api_type": "open_ai", 
+            "api_key": "NULL", # just a placeholder 
+        } 
+    ]
 
 # The Number Agent always returns the same numbers.
 number_agent = ConversableAgent(
@@ -56,40 +51,30 @@ divider_agent = ConversableAgent(
     llm_config={"config_list": config_list},
     human_input_mode="NEVER",
 )
+from autogen import GroupChat
 
-# Start a sequence of two-agent chats.
-# Each element in the list is a dictionary that specifies the arguments
-# for the initiate_chat method.
-chat_results = number_agent.initiate_chats(
+group_chat = GroupChat(
+    agents=[adder_agent, multiplier_agent, subtracter_agent, divider_agent, number_agent],
+    messages=[],
+    max_round=6,
+    send_introductions=True # 自动发送自我介绍
+)
+
+from autogen import GroupChatManager
+group_chat_manager_with_intros = GroupChatManager(
+    groupchat=group_chat,
+    llm_config={"config_list": config_list},
+)
+chat_result = number_agent.initiate_chats(
     [
         {
-            "recipient": adder_agent,
-            "message": "14",
-            "max_turns": 2,
-            "summary_method": "last_msg",
+            "recipient": group_chat_manager_with_intros,
+            "message": "My number is 3, I want to turn it into 13.",
         },
         {
-            "recipient": multiplier_agent,
-            "message": "These are my numbers",
-            "max_turns": 2,
-            "summary_method": "last_msg",
-        },
-        {
-            "recipient": subtracter_agent,
-            "message": "These are my numbers",
-            "max_turns": 2,
-            "summary_method": "last_msg",
-        },
-        {
-            "recipient": divider_agent,
-            "message": "These are my numbers",
-            "max_turns": 2,
-            "summary_method": "last_msg",
+            "recipient": group_chat_manager_with_intros,
+            "message": "Turn this number to 32.",
         },
     ]
 )
 
-print("First Chat Summary: ", chat_results[0].summary)
-print("Second Chat Summary: ", chat_results[1].summary)
-print("Third Chat Summary: ", chat_results[2].summary)
-print("Fourth Chat Summary: ", chat_results[3].summary)
